@@ -1,0 +1,88 @@
+#!/bin/bash
+set -eu
+
+
+info() { printf "\033[30;1m%s\033[0m\n" "$*"; }
+fail() { printf "\033[31;1m%s\033[0m\n" "$*"; }
+pass() { printf "\033[32;1m%s\033[0m\n" "$*"; }
+
+
+cleanup() { rm -f {input,output,stdout}.txt; }
+
+partial=0
+trap 'if [[ $partial -eq 1 ]]; then cleanup; fi' EXIT
+
+
+run() {
+	info "rr $1 <$2 >$3"
+	rr "$1" <"$2" >"$3" || { fail "RE (exit status: $?)"; exit 2; }
+}
+
+judge() {
+	if [[ ! -f output.txt ]]; then
+		pass OK
+	elif diff -B -b -q stdout.txt output.txt >/dev/null; then
+		pass AC
+	else
+		fail WA
+		diff -B -b -y -W 100 stdout.txt output.txt
+	fi
+}
+
+extract_test() {
+	awk -v K="$1" '
+		$0 == "input:" { name = "input"; if (++i > K) exit 0; next }
+		$0 == "output:" { name = "output"; next }
+		i == K { print > name ".txt" }
+		END { if (i < K) exit 1 }
+	' tests.txt
+}
+
+get_test() {
+	cleanup
+	partial=1
+	extract_test "$1" || return
+	partial=0
+}
+
+gen_test() {
+	cleanup
+	partial=1
+	run "$1" /dev/null input.txt
+	if [[ -n $2 ]]; then
+		run "$2" input.txt output.txt
+	fi
+	partial=0
+}
+
+
+if [[ $# -lt 1 || $# -gt 3 ]]; then
+	echo "usage: tt <solution> [generator [solver]]" >&2
+	exit 1
+fi
+
+if [[ $# -eq 1 ]]; then
+	if [[ -f input.txt ]]; then
+		run "$1" input.txt stdout.txt
+		judge && cleanup
+
+	elif [[ -f tests.txt ]]; then
+		for (( k=1; ; k++ )); do
+			get_test $k || break
+			info "test #$k:"
+			run "$1" input.txt stdout.txt
+			judge || read
+		done
+
+	else
+		run "$1" /dev/stdin /dev/stdout
+	fi
+else
+	for (( k=1; ; k++ )); do
+		info "test #$k:"
+		gen_test "$2" "$3"
+		run "$1" input.txt stdout.txt
+		judge || read
+	done
+fi
+

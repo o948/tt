@@ -1,0 +1,36 @@
+#!/bin/bash
+set -eu
+
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+	echo "usage: rr <source> [memory-limit]" >&2
+	exit 1
+fi
+
+src="$1"
+mem="${2:-256}"
+
+run() {
+	ulimit -s $(( $mem * 1024 ))
+	ulimit -v $(( $mem * 1024 ))
+	"$@"
+}
+
+case "$src" in
+*.cpp)
+	bin="_${src%.cpp}"
+	if [[ ! -f $bin || $src -nt $bin ]]; then
+		g++ -std=c++11 -Wall -Wextra -O2 -DLOCAL -o "$bin" "$src"
+	fi
+	run "./$bin"
+	;;
+
+*.py)
+	run python3 "$src"
+	;;
+
+*)
+	echo "rr: don't know how to run '${src}'" >&2
+	exit 1
+	;;
+esac
+

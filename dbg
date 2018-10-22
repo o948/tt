@@ -1,0 +1,21 @@
+#!/bin/bash
+set -eu
+
+if [[ $# -lt 1 ]]; then
+	echo "usage: dbg <source>" >&2
+	exit 1
+fi
+
+src="$1"
+if [[ $src != *.cpp ]]; then
+	echo "dbg: don't know how to debug '${src}'" >&2
+	exit 1
+fi
+
+bin="_${src%.cpp}_dbg"
+if [[ ! -f $bin || $src -nt $bin ]]; then
+	g++ -std=c++11 -g -Og -DLOCAL -o "$bin" "$src"
+fi
+
+gdb --tui "$bin"
+
