@@ -80,7 +80,7 @@ if [[ $# -eq 1 ]]; then
 else
 	for (( k=1; ; k++ )); do
 		info "test #$k:"
-		gen_test "$2" "$3"
+		gen_test "$2" "${3:-}"
 		run "$1" input.txt stdout.txt
 		judge || read
 	done
