@@ -75,7 +75,8 @@ if [[ $# -eq 1 ]]; then
 		done
 
 	else
-		run "$1" /dev/stdin /dev/stdout
+		echo "tt: neither input.txt nor tests.txt found" >&2
+		exit 1
 	fi
 else
 	for (( k=1; ; k++ )); do
