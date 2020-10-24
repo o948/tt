@@ -19,7 +19,7 @@ case "$src" in
 *.cpp)
 	bin="_${src%.cpp}"
 	if [[ ! -f $bin || $src -nt $bin ]]; then
-		g++ -std=c++17 -Wall -Wextra -O2 -DLOCAL -o "$bin" "$src"
+		g++ -std=c++17 -Wall -Wextra -O2 -o "$bin" "$src"
 	fi
 	run "./$bin"
 	;;
