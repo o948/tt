@@ -28,6 +28,15 @@ case "$src" in
 	run python3 "$src"
 	;;
 
+*.java)
+	name="${src%.java}"
+	bin="${name}.class"
+	if [[ ! -f $bin || $src -nt $bin ]]; then
+		javac "$src"
+	fi
+	java "-Xmx${mem}M" "-Xss${mem}M" "$name"
+	;;
+
 *)
 	echo "rr: don't know how to run '${src}'" >&2
 	exit 1
