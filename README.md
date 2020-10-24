@@ -3,7 +3,7 @@ Scripts for testing programming problem solutions.
 ## Usage
 
 ### `rr <source> [memory-limit]`
-Will compile and run the `source` (Python3 or C++11).
+Will compile and run the `source` (C++17, Java or Python3).
 The `memory-limit` is in MBs (default: 256).
 
 
@@ -77,5 +77,5 @@ done
 
 
 ### `dbg <source>`
-Will compile the `source` (C++11) and start `gdb`.
+Will compile the `source` (C++17) and start `gdb`.
 
