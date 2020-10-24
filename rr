@@ -11,7 +11,7 @@ mem="${2:-256}"
 
 run() {
 	ulimit -s $(( $mem * 1024 ))
-	ulimit -v $(( $mem * 1024 ))
+	ulimit -d $(( $mem * 1024 ))
 	"$@"
 }
 
