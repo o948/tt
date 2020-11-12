@@ -12,7 +12,7 @@ If `input.txt` exists, will do:
 ```bash
 rr solution <input.txt >stdout.txt
 ```
-and if `output.txt` exists, will do:
+and then if `output.txt` exists, will do:
 ```bash
 diff stdout.txt output.txt
 ```
