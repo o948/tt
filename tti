@@ -1,0 +1,21 @@
+#!/bin/bash
+set -eu
+
+info() { printf "\033[30;1m%s\033[0m\n" "$*"; }
+fail() { printf "\033[31;1m%s\033[0m\n" "$*"; }
+pass() { printf "\033[32;1m%s\033[0m\n" "$*"; }
+
+if [[ $# -ne 2 ]]; then
+ echo "usage: tti <solution> <checker>" >&2
+ exit 1
+fi
+
+for (( k=1; ; k++ )); do
+  info "run #$k:"
+  f="$(mktemp -u)" && mkfifo "$f" && exec 12<>"$f" && rm "$f"
+  f="$(mktemp -u)" && mkfifo "$f" && exec 21<>"$f" && rm "$f"
+
+  rr "$1" <&21 >&12 &
+  rr "$2" <&12 >&21 && pass OK || (fail WA && read)
+done
+
